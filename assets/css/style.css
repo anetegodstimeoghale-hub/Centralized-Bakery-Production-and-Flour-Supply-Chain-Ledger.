@@ -1,0 +1,1350 @@
+/* ==========================================================================
+   assets/css/style.css  -  Bakery Ledger visual design
+   --------------------------------------------------------------------------
+   This is the ONLY file that decides how the application looks.
+   It contains no PHP, no formulas and touches no database - it only paints
+   the markup that the PHP pages already produce.
+
+   SECTION MAP
+   --------------------------------------------------------------------------
+    1. DESIGN TOKENS        colours, corner radii, shadows + theme tokens
+    2. BOOTSTRAP OVERRIDES  re-colour the local Bootstrap copy with those tokens
+    3. BASE + TYPOGRAPHY    body, headings, links, page title + subtitle
+    4. HEADER + NAVIGATION  chocolate top bar, hamburger menu, ☀️/🌙 switch
+    5. CARDS                statistic cards and white panels
+    6. CHARTS               chart containers
+    7. BUTTONS              terracotta primary + outline variants
+    8. FORMS                labels, inputs, focus, validation states
+    9. TABLES               header, rows, hover, zebra striping
+   10. BADGES               status pills (OK / REORDER / morning / evening ...)
+   11. ALERTS + WARNINGS    soft red / amber / green message boxes
+   12. EXTRAS               formula box, code block, IDOR cards, footer
+   13. RESPONSIVE           phones and small tablets
+   14. LIGHT / DARK THEME   the dark-chocolate mode behind the ☀️/🌙 switch
+   15. DEMO USER SWITCHER   the named "choose the demo user" list (Security page)
+   ========================================================================== */
+
+/* ==========================================================================
+   1. DESIGN TOKENS
+   --------------------------------------------------------------------------
+   Every colour used by the application is defined once, right here.
+   ========================================================================== */
+:root {
+    /* --- dark chocolate (navigation, headings) --- */
+    --choco-900: #1f1006;
+    --choco-800: #33200f;
+    --choco-700: #4a3122;
+    --choco-600: #6d4620;
+
+    /* --- bakery brand (kept for compatibility with older rules) --- */
+    --brand: #8a5a2b;          /* crust brown  */
+    --brand-dark: #6d4620;
+    --brand-accent: #f0a35e;   /* warm highlight */
+
+    /* --- warm orange / terracotta (buttons + highlights) ---
+       deliberately a touch darker than a pure orange: white text on it (and
+       it as link text on white) still clears the WCAG AA 4.5:1 contrast. --- */
+    --terracotta: #b94f22;
+    --terracotta-dark: #9c431c;
+    --terracotta-deeper: #8a3b18;
+    --terracotta-soft: #f7e3d6;
+    --terracotta-line: #d07b4e;
+
+    /* --- cream / beige page background --- */
+    --cream: #faf5ec;
+    --cream-2: #f2eadb;
+    --cream-3: #fcf9f3;
+
+    /* --- semantic colours --- */
+    --green: #2f7d4f;
+    --green-soft: #e3f3e9;
+    --red: #c0392b;
+    --red-soft: #fdecea;
+    --amber: #a85f00;
+    --amber-soft: #fbf0dc;
+
+    /* --- text and lines --- */
+    --ink: #2c211a;
+    --muted: #7a6a5d;
+    --line: #eadfd0;
+
+    /* --- shapes and depth --- */
+    --radius-sm: .55rem;
+    --radius-md: .9rem;
+    --radius-lg: 1.15rem;
+    --shadow-sm: 0 1px 2px rgba(45, 28, 12, .05), 0 8px 20px rgba(45, 28, 12, .06);
+    --shadow-md: 0 12px 28px rgba(45, 28, 12, .12);
+
+    /* --- THEME TOKENS -------------------------------------------------
+       Every colour that has to change between LIGHT and DARK mode is
+       named here (light values) and re-declared in section 14. Nothing
+       else in this file needs to know which mode is on. --- */
+    --surface: #ffffff;                  /* cards, panels, inputs, tables  */
+    --heading: var(--choco-800);         /* page titles + big numbers      */
+    --heading-2: var(--choco-700);       /* smaller headings and labels    */
+    --on-soft: var(--choco-700);         /* text sitting on a soft surface */
+    --thead-top: #fdfaf4;                /* top of the table header fade   */
+    --table-hover: #f7efe2;              /* hovered table row              */
+    --input-bg: #ffffff;                 /* form field background          */
+    --card-border: rgba(45, 28, 12, .07);
+    --link: var(--terracotta);           /* link / outline-button text     */
+    --link-hover: var(--terracotta-dark);
+    --terracotta-text: var(--terracotta);
+    --green-text: var(--green);
+    --red-text: var(--red);
+    --amber-text: var(--amber);
+    --cell-alert-fg: var(--terracotta-deeper);  /* number in a red row      */
+    --row-danger-fg: #8e2a1f;
+    --row-success-fg: #1e5b3a;
+    --row-warning-fg: #8a5200;
+    --badge-secondary: var(--muted);
+    --badge-warning-bg: #f5d9a8;
+    --badge-warning-fg: #7a4b00;
+    --code-inline-bg: rgba(45, 28, 12, .06);
+    --formula-bg: #fdf8ee;
+    --formula-fg: var(--choco-700);
+    --formula-border: #e0b877;
+    --formula-code-fg: var(--choco-600);
+    --vuln-bg: #fffdfc;
+    --secure-bg: #fbfefc;
+    --banner-bg: linear-gradient(90deg, var(--red-soft), #fbdfdb);
+    --banner-border: #f2c3bc;
+    --banner-fg: #8e2a1f;
+    --alert-shadow: 0 1px 3px rgba(45, 28, 12, .05);
+
+    /* makes the light palette the default for native widgets too */
+    color-scheme: light;
+}
+
+/* ==========================================================================
+   2. BOOTSTRAP OVERRIDES
+   --------------------------------------------------------------------------
+   Bootstrap 5 reads its colours from CSS variables. Re-declaring them here
+   (style.css is loaded AFTER bootstrap.min.css) re-themes every component -
+   text, links, tables, alerts, badges - without editing the library itself.
+   ========================================================================== */
+:root {
+    /* semantic hex colours (used by .border-primary, .bg-success, ...) */
+    --bs-primary: var(--terracotta);
+    --bs-secondary: var(--muted);
+    --bs-success: var(--green);
+    --bs-danger: var(--red);
+    --bs-warning: var(--amber);
+    --bs-info: #7a6955;
+    --bs-light: #fdf9f2;
+    --bs-dark: var(--choco-800);
+
+    /* page + text */
+    --bs-body-bg: var(--cream);
+    --bs-body-color: var(--ink);
+    --bs-emphasis-color: var(--ink);
+    --bs-emphasis-color-rgb: 44, 33, 26;
+    --bs-secondary-color: var(--muted);
+    --bs-heading-color: var(--heading);
+    --bs-border-color: var(--line);
+
+    /* corners */
+    --bs-border-radius: .55rem;
+    --bs-border-radius-sm: .375rem;
+    --bs-border-radius-lg: .8rem;
+    --bs-border-radius-xl: 1.1rem;
+
+    /* links */
+    --bs-link-color: var(--link);
+    --bs-link-color-rgb: 185, 79, 34;
+    --bs-link-hover-color: var(--link-hover);
+    --bs-link-hover-color-rgb: 156, 67, 28;
+
+    /* semantic RGB values (drives .text-primary, .text-danger, ...) */
+    --bs-primary-rgb: 185, 79, 34;
+    --bs-secondary-rgb: 122, 109, 93;
+    --bs-success-rgb: 47, 125, 79;
+    --bs-danger-rgb: 192, 57, 43;
+    --bs-warning-rgb: 168, 95, 0;
+    --bs-info-rgb: 122, 105, 85;
+    --bs-light-rgb: 253, 249, 242;
+    --bs-dark-rgb: 51, 32, 15;
+
+    /* soft bakery palettes used by .alert-*** boxes */
+    --bs-primary-text-emphasis: var(--terracotta-text);
+    --bs-success-text-emphasis: #1e5b3a;
+    --bs-success-bg-subtle: var(--green-soft);
+    --bs-success-border-subtle: #c4e3d1;
+    --bs-danger-text-emphasis: #8e2a1f;
+    --bs-danger-bg-subtle: var(--red-soft);
+    --bs-danger-border-subtle: #f5c9c3;
+    --bs-warning-text-emphasis: #8a5200;
+    --bs-warning-bg-subtle: var(--amber-soft);
+    --bs-warning-border-subtle: #efdcb8;
+    --bs-info-text-emphasis: #5a4a3a;
+    --bs-info-bg-subtle: #f3ede2;
+    --bs-info-border-subtle: #e3d8c6;
+    --bs-light-text-emphasis: #6b5b4b;
+    --bs-light-bg-subtle: #fdfbf6;
+    --bs-light-border-subtle: var(--line);
+    --bs-dark-text-emphasis: var(--choco-800);
+    --bs-dark-bg-subtle: #f1e9dc;
+    --bs-dark-border-subtle: #e1d4c0;
+
+    /* inline <code> ... </code> - Bootstrap ships a bright pink that does not
+       belong to the bakery palette (and is hard to read on warm backgrounds) */
+    --bs-code-color: var(--choco-600);
+}
+
+/* the page background + base font */
+body {
+    background-color: var(--cream);
+    /* a very soft warm glow in the top-left corner */
+    background-image: radial-gradient(1100px 480px at 12% -8%, rgba(185, 79, 34, .07), transparent 62%);
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   3. BASE + TYPOGRAPHY
+   ========================================================================== */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--heading);
+    font-weight: 700;
+    letter-spacing: -.01em;
+}
+
+/* links: keep them readable (underline) but in the bakery terracotta */
+a {
+    color: var(--link);
+    text-decoration-color: rgba(185, 79, 34, .45);
+    text-underline-offset: 2px;
+}
+
+a:hover {
+    color: var(--link-hover);
+    text-decoration-color: currentColor;
+}
+
+/* --- page title + subtitle (identical pattern on every page) --- */
+.app-content h1.h3 {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--heading);
+    letter-spacing: -.02em;
+}
+
+/* short terracotta accent bar under the page title
+   (skipped on error headings such as "403 - FORBIDDEN") */
+.app-content h1.h3:not(.text-danger) {
+    padding-bottom: .7rem;       /* room for the accent bar underneath */
+    position: relative;
+}
+
+.app-content h1.h3:not(.text-danger)::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 64px;
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--terracotta), var(--brand-accent));
+}
+
+.app-content h1.h3 + p.text-muted {
+    color: var(--muted);
+    font-size: .97rem;
+    max-width: 75ch;
+}
+
+/* section titles inside the white panels */
+.app-content h2.h5 {
+    color: var(--heading-2);
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+/* small uppercase labels (security pages) */
+.app-content h2.h6 {
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+}
+
+.text-muted,
+small.text-muted {
+    color: var(--muted) !important;
+}
+
+/* ==========================================================================
+   4. HEADER + NAVIGATION  (dark chocolate)
+   ========================================================================== */
+
+/* ---------- shell layout ---------- */
+.app-shell {
+    display: flex;
+    align-items: stretch;
+    min-height: 100vh;
+}
+
+.app-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;              /* important: allows tables to shrink */
+}
+
+.app-content {
+    flex: 1 1 auto;
+}
+
+/* ---------- sticky header wrapper ---------- */
+.app-header {
+    position: sticky;          /* menu stays on screen while scrolling */
+    top: 0;
+    z-index: 1030;
+    background: var(--surface);
+    box-shadow: 0 2px 12px rgba(45, 28, 12, .10);
+}
+
+/* ---------- the navigation bar (always dark chocolate) ---------- */
+.app-topnav {
+    background: linear-gradient(180deg, var(--choco-800) 0%, var(--choco-900) 100%);
+    padding: .35rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, .35);
+}
+
+.app-topnav .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin-right: .75rem;
+    color: #fff;
+}
+
+.app-topnav .navbar-brand strong {
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: -.01em;
+    white-space: nowrap;
+}
+
+.app-topnav .navbar-brand small {
+    display: block;
+    color: rgba(255, 255, 255, .62);
+    font-size: .72rem;
+    letter-spacing: .04em;
+    line-height: 1.1;
+}
+
+.app-topnav .navbar-brand:hover strong { color: var(--brand-accent); }
+
+/* the little "BL" logo tile */
+.app-brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--terracotta), var(--terracotta-dark));
+    color: #fff;
+    font-weight: 800;
+    font-size: .95rem;
+    letter-spacing: .5px;
+    flex: 0 0 auto;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 4px 10px rgba(0, 0, 0, .25);
+}
+
+/* ---------- right hand tools: user + ☀️/🌙 + ☰ ---------- */
+.app-topnav-tools {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-left: auto;                 /* always pinned to the right */
+    padding: .25rem 0 .25rem .5rem;
+}
+
+/* "signed in as ..." - stays visible next to the hamburger */
+.app-topnav .app-nav-user {
+    display: flex;
+    align-items: baseline;
+    gap: .35rem;
+    max-width: 12rem;
+    min-width: 0;
+    white-space: nowrap;
+    color: rgba(255, 255, 255, .72);
+}
+
+.app-topnav .app-nav-user-prefix { color: rgba(255, 255, 255, .58); }
+
+.app-topnav .app-nav-user-name {
+    color: #fff;
+    font-weight: 700;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ---------- light / dark mode switch ---------- */
+.app-theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: .1rem;
+    padding: .32rem .5rem;
+    line-height: 1;
+    font-size: .95rem;
+    color: #fff;
+    background: rgba(255, 255, 255, .10);
+    border: 1px solid rgba(255, 255, 255, .30);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease, transform .1s ease;
+}
+
+.app-theme-toggle:hover {
+    background: rgba(255, 255, 255, .20);
+    border-color: rgba(255, 255, 255, .50);
+}
+
+.app-theme-toggle:active { transform: translateY(1px); }
+
+.app-theme-toggle:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 .22rem rgba(240, 163, 94, .55);
+}
+
+/* the icon of the mode you are IN is lit; the other one is dimmed */
+.app-theme-toggle .theme-ico {
+    opacity: .35;
+    filter: grayscale(.7);
+    transition: opacity .15s ease, filter .15s ease;
+}
+
+.app-theme-toggle .theme-ico-sun { opacity: 1; filter: none; }
+
+[data-bs-theme="dark"] .app-theme-toggle .theme-ico-sun  { opacity: .35; filter: grayscale(.7); }
+[data-bs-theme="dark"] .app-theme-toggle .theme-ico-moon { opacity: 1;    filter: none; }
+
+/* ---------- menu items ---------- */
+.app-topnav .nav-link {
+    display: block;
+    color: rgba(255, 255, 255, .82);
+    font-weight: 600;
+    font-size: .92rem;
+    padding: .55rem .85rem;
+    border-radius: .6rem;
+    margin: .1rem 0;
+    white-space: nowrap;
+    transition: background-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+
+.app-topnav .nav-link:hover,
+.app-topnav .nav-link:focus-visible {
+    color: #fff;
+    background: rgba(255, 255, 255, .10);
+}
+
+/* the page you are on right now = terracotta pill */
+.app-topnav .nav-link.active,
+.app-topnav .nav-link.active:hover,
+.app-topnav .nav-link.active:focus-visible {
+    color: #fff;
+    background: linear-gradient(180deg, var(--terracotta), var(--terracotta-dark));
+    box-shadow: 0 4px 12px rgba(185, 79, 34, .38), inset 0 1px 0 rgba(255, 255, 255, .25);
+}
+
+/* ---------- the ☰ drop-down panel (opens on desktop AND on phones) ----------
+   Bootstrap already stacks the items vertically; these lines only give the
+   panel a full width row, a top divider and a scroll limit. */
+.app-topnav .navbar-collapse {
+    flex-basis: 100%;
+    margin-top: .4rem;
+    padding: .3rem 0 .45rem;
+    border-top: 1px solid rgba(255, 255, 255, .14);
+    max-height: calc(100vh - 76px);    /* never taller than the screen */
+    overflow-y: auto;
+}
+
+.app-topnav .navbar-nav { width: 100%; }
+
+/* "switch demo user ->" sits under a divider at the bottom of the menu */
+.app-topnav .app-nav-switch {
+    display: block;
+    margin-top: .4rem;
+    padding: .7rem .85rem .3rem;
+    color: rgba(255, 255, 255, .72);
+    font-size: .87rem;
+    font-weight: 600;
+    border-top: 1px solid rgba(255, 255, 255, .14);
+    text-decoration: none;
+}
+
+.app-topnav .app-nav-switch:hover,
+.app-topnav .app-nav-switch:focus-visible {
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* three-line hamburger button (shown on desktop + mobile) */
+.app-topnav .navbar-toggler {
+    border-color: rgba(255, 255, 255, .30);
+    padding: .35rem .55rem;
+}
+
+.app-topnav .navbar-toggler:focus {
+    box-shadow: 0 0 0 .22rem rgba(240, 163, 94, .55);
+}
+
+/* ---------- page title bar (under the menu) ---------- */
+.app-topbar {
+    position: relative;
+    z-index: 1;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+}
+
+.app-topbar .navbar-text {
+    color: var(--heading-2);
+    font-weight: 700;
+    font-size: .95rem;
+    letter-spacing: .01em;
+}
+
+.app-topbar .navbar-text + span {
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   5. CARDS  (white cards with a soft shadow)
+   ========================================================================== */
+.card,
+.stat-card,
+.table-card,
+.chart-box {
+    background: var(--surface);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+/* statistic cards: warm top stripe + a gentle lift on hover */
+.stat-card {
+    overflow: hidden;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.stat-card::before {
+    content: "";
+    display: block;
+    height: 4px;
+    background: linear-gradient(90deg, var(--terracotta), var(--brand-accent));
+    opacity: .9;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(185, 79, 34, .25);
+}
+
+.stat-card .stat-body {
+    padding: 1.05rem 1.25rem 1.2rem;
+}
+
+.stat-label {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.stat-value {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--heading);
+    line-height: 1.15;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;   /* aligned digits */
+    word-break: break-word;
+    margin-top: .15rem;
+}
+
+.stat-sub {
+    font-size: .8rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.stat-sub a {
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.stat-sub a:hover { text-decoration: underline; }
+
+.stat-accent {
+    width: 6px;
+    height: 100%;
+    background: var(--terracotta);
+}
+
+/* white panels that hold a form or a table */
+.table-card {
+    overflow: hidden;
+}
+
+.table-card .table {
+    margin-bottom: 0;
+}
+
+/* ==========================================================================
+   6. CHARTS
+   ========================================================================== */
+.chart-box {
+    padding: 1.15rem 1.3rem 1.25rem;
+}
+
+.chart-box h2.h5 {
+    color: var(--heading-2);
+    font-size: 1.02rem;
+    font-weight: 700;
+}
+
+.chart-box small {
+    color: var(--muted);
+    font-size: .78rem;
+}
+
+.chart-canvas-wrap {
+    position: relative;
+    height: 340px;
+}
+
+/* ==========================================================================
+   7. BUTTONS  (warm orange / terracotta)
+   ========================================================================== */
+.btn {
+    --bs-btn-font-weight: 600;
+    --bs-btn-font-size: .95rem;
+    --bs-btn-border-radius: var(--radius-sm);
+    --bs-btn-padding-y: .5rem;
+    --bs-btn-padding-x: 1.1rem;
+    --bs-btn-box-shadow: 0 1px 2px rgba(45, 28, 12, .12);
+}
+
+.btn-sm {
+    --bs-btn-font-size: .84rem;
+    --bs-btn-padding-y: .3rem;
+    --bs-btn-padding-x: .75rem;
+    --bs-btn-border-radius: .45rem;
+}
+
+.btn-primary {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--terracotta);
+    --bs-btn-border-color: var(--terracotta);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--terracotta-dark);
+    --bs-btn-hover-border-color: var(--terracotta-dark);
+    --bs-btn-focus-shadow-rgb: 185, 79, 34;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--terracotta-deeper);
+    --bs-btn-active-border-color: var(--terracotta-deeper);
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, .18);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #dda98e;
+    --bs-btn-disabled-border-color: #dda98e;
+}
+
+.btn-success {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--green);
+    --bs-btn-border-color: var(--green);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #256540;
+    --bs-btn-hover-border-color: #256540;
+    --bs-btn-focus-shadow-rgb: 47, 125, 79;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #1e5336;
+    --bs-btn-active-border-color: #1e5336;
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #9dc4ae;
+    --bs-btn-disabled-border-color: #9dc4ae;
+}
+
+.btn-danger {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--red);
+    --bs-btn-border-color: var(--red);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #a5281b;
+    --bs-btn-hover-border-color: #a5281b;
+    --bs-btn-focus-shadow-rgb: 192, 57, 43;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #8e2a1f;
+    --bs-btn-active-border-color: #8e2a1f;
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #e0a49d;
+    --bs-btn-disabled-border-color: #e0a49d;
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--terracotta-text);
+    --bs-btn-border-color: var(--terracotta-line);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--terracotta);
+    --bs-btn-hover-border-color: var(--terracotta);
+    --bs-btn-focus-shadow-rgb: 185, 79, 34;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--terracotta-dark);
+    --bs-btn-active-border-color: var(--terracotta-dark);
+    --bs-btn-disabled-color: var(--terracotta);
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: var(--terracotta-line);
+}
+
+.btn-outline-secondary {
+    --bs-btn-color: var(--heading-2);
+    --bs-btn-border-color: #a3907c;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--choco-700);
+    --bs-btn-hover-border-color: var(--choco-700);
+    --bs-btn-focus-shadow-rgb: 74, 49, 34;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--choco-800);
+    --bs-btn-active-border-color: var(--choco-800);
+    --bs-btn-disabled-color: var(--heading-2);
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: #a3907c;
+}
+
+.btn-outline-danger {
+    --bs-btn-color: var(--red-text);
+    --bs-btn-border-color: #d97a6e;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--red);
+    --bs-btn-hover-border-color: var(--red);
+    --bs-btn-focus-shadow-rgb: 192, 57, 43;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #8e2a1f;
+    --bs-btn-active-border-color: #8e2a1f;
+    --bs-btn-disabled-color: var(--red);
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: #d97a6e;
+}
+
+.btn-outline-success {
+    --bs-btn-color: var(--green-text);
+    --bs-btn-border-color: #4f9d75;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--green);
+    --bs-btn-hover-border-color: var(--green);
+    --bs-btn-focus-shadow-rgb: 47, 125, 79;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #1e5336;
+    --bs-btn-active-border-color: #1e5336;
+    --bs-btn-disabled-color: var(--green);
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: #4f9d75;
+}
+
+.btn-outline-warning {
+    --bs-btn-color: var(--amber-text);
+    --bs-btn-border-color: #c07f14;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--amber);
+    --bs-btn-hover-border-color: var(--amber);
+    --bs-btn-focus-shadow-rgb: 168, 95, 0;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #8a5200;
+    --bs-btn-active-border-color: #8a5200;
+    --bs-btn-disabled-color: var(--amber);
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: #c07f14;
+}
+
+/* ==========================================================================
+   8. FORMS
+   ========================================================================== */
+.form-label {
+    color: var(--heading-2);
+    font-weight: 600;
+    font-size: .89rem;
+    margin-bottom: .35rem;
+}
+
+.form-control,
+.form-select {
+    background-color: var(--input-bg);   /* never the cream body colour */
+    color: var(--ink);
+    border: 1px solid #a38c74;
+    border-radius: var(--radius-sm);
+    padding: .55rem .8rem;
+    font-size: .95rem;
+    box-shadow: none;
+}
+
+.form-control::placeholder {
+    color: #b3a797;
+}
+
+.form-control:hover,
+.form-select:hover {
+    border-color: var(--terracotta-line);
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: var(--input-bg);
+    color: var(--ink);
+    border-color: var(--terracotta);
+    box-shadow: 0 0 0 .22rem rgba(185, 79, 34, .16);
+}
+
+.form-select {
+    padding-right: 2.4rem;               /* room for the arrow Bootstrap draws here */
+}
+
+.form-text {
+    color: var(--muted);
+    font-size: .8rem;
+}
+
+/* validation */
+.is-invalid {
+    border-color: #d64545 !important;
+}
+
+.is-invalid:focus {
+    border-color: #d64545 !important;
+    box-shadow: 0 0 0 .22rem rgba(214, 69, 69, .18) !important;
+}
+
+.invalid-feedback {
+    color: var(--red-text);
+    font-weight: 600;
+    font-size: .82rem;
+}
+
+.form-check-input:checked {
+    background-color: var(--terracotta);
+    border-color: var(--terracotta);
+}
+
+.input-group-text {
+    background: var(--cream-2);
+    border-color: #a38c74;
+    color: var(--heading-2);
+    border-radius: var(--radius-sm);
+}
+
+/* ==========================================================================
+   9. TABLES
+   ========================================================================== */
+.table {
+    --bs-table-bg: var(--surface);
+    --bs-table-color: var(--ink);
+    --bs-table-border-color: var(--line);
+    --bs-table-hover-bg: var(--table-hover);
+    --bs-table-hover-color: var(--ink);
+    color: var(--ink);
+}
+
+.table td,
+.table th {
+    padding: .78rem .95rem;
+    vertical-align: middle;
+    font-size: .92rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.table thead th {
+    background: linear-gradient(180deg, var(--thead-top), var(--cream-2));
+    color: var(--heading-2);
+    font-size: .71rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    border-bottom: 2px solid var(--line) !important;
+    white-space: nowrap;
+}
+
+/* soft zebra striping - painted through Bootstrap's --bs-table-bg-type */
+.table > tbody > tr:nth-of-type(even) > * {
+    --bs-table-bg-type: var(--cream-3);
+}
+
+/* semantic row tints (e.g. "REORDER REQUIRED" / waste over the limit rows)
+   in the bakery palette instead of Bootstrap's cold pinks and greens */
+.table-danger  { --bs-table-bg: var(--red-soft);   --bs-table-color: var(--row-danger-fg); }
+.table-success { --bs-table-bg: var(--green-soft); --bs-table-color: var(--row-success-fg); }
+.table-warning { --bs-table-bg: var(--amber-soft); --bs-table-color: var(--row-warning-fg); }
+
+/* the zebra stripe and the hover tint must not paint over those rows */
+.table > tbody > tr.table-danger > *,
+.table > tbody > tr.table-success > *,
+.table > tbody > tr.table-warning > * {
+    --bs-table-bg-type: transparent;
+}
+
+.table > tbody > tr.table-danger:hover > *,
+.table > tbody > tr.table-success:hover > *,
+.table > tbody > tr.table-warning:hover > * {
+    --bs-table-bg-state: transparent;
+}
+
+/* ...and a terracotta number inside a warning row stays readable on that tint */
+.table-danger .text-primary {
+    color: var(--cell-alert-fg) !important;
+}
+
+.table > tbody > tr:hover > * {
+    --bs-table-bg-state: var(--table-hover);
+}
+
+.table > tbody > tr {
+    transition: background-color .12s ease;
+}
+
+.table a {
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.table a:hover { text-decoration: underline; }
+
+/* ==========================================================================
+   10. BADGES  (status pills)
+   ========================================================================== */
+.badge {
+    --bs-badge-border-radius: 50rem;
+    --bs-badge-font-weight: 700;
+    --bs-badge-font-size: .72em;
+    padding: .38em .75em;
+    letter-spacing: .03em;
+    vertical-align: middle;
+}
+
+.badge-buffer { background: var(--terracotta) !important; }
+.badge-ok     { background: var(--green) !important; }
+.badge-reorder{ background: var(--red) !important; }
+.badge-watch  { background: var(--amber) !important; }
+
+/* Bootstrap .text-bg-* utilities, re-coloured for the bakery palette */
+.text-bg-primary   { background-color: var(--terracotta) !important; color: #fff !important; }
+.text-bg-secondary { background-color: var(--badge-secondary) !important; color: #fff !important; }
+.text-bg-success   { background-color: var(--green) !important; color: #fff !important; }
+.text-bg-danger    { background-color: var(--red) !important; color: #fff !important; }
+.text-bg-info      { background-color: var(--cream-2) !important; color: var(--on-soft) !important; }
+.text-bg-light     { background-color: var(--cream-2) !important; color: var(--on-soft) !important; }
+.text-bg-dark      { background-color: var(--choco-800) !important; color: #fff !important; }
+/* amber on white would be unreadable, so this one stays soft with dark text */
+.text-bg-warning   { background-color: var(--badge-warning-bg) !important; color: var(--badge-warning-fg) !important; }
+
+/* ==========================================================================
+   11. ALERTS + WARNINGS
+   ========================================================================== */
+.alert {
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font-size: .93rem;
+    line-height: 1.5;
+    box-shadow: var(--alert-shadow);
+}
+
+.alert strong { color: inherit; }
+
+/* colour-coded left edge (Bootstrap's `border-0` utility removes it where set) */
+.alert-danger  { border-left: 4px solid var(--red); }
+.alert-warning { border-left: 4px solid #d98324; }
+.alert-success { border-left: 4px solid var(--green); }
+.alert-info    { border-left: 4px solid var(--brand); }
+.alert-light   { border-left: 4px solid var(--terracotta); }
+
+.alert ul {
+    margin-top: .3rem;
+    padding-left: 1.15rem;
+}
+
+.alert code {
+    background: var(--code-inline-bg);
+    padding: .05rem .35rem;
+    border-radius: 4px;
+    font-size: .87em;
+}
+
+/* the "INVESTIGATION REQUIRED" banner on the dashboard / production pages */
+.investigation-banner {
+    background: var(--banner-bg);
+    border: 1px solid var(--banner-border);
+    border-left: 5px solid var(--red);
+    color: var(--banner-fg);
+    font-weight: 800;
+    letter-spacing: .05em;
+    font-size: .87rem;
+    border-radius: .6rem;
+    padding: .75rem 1rem;
+    display: inline-block;
+    box-shadow: 0 2px 8px rgba(192, 57, 43, .12);
+}
+
+/* ==========================================================================
+   12. EXTRAS  (formula box, code block, IDOR cards, footer)
+   ========================================================================== */
+
+/* ---- formula / explanation box ---- */
+.formula-box {
+    background: var(--formula-bg);
+    border: 1px dashed var(--formula-border);
+    border-radius: var(--radius-md);
+    padding: .95rem 1.15rem;
+    font-size: .93rem;
+    color: var(--formula-fg);
+}
+
+.formula-box code {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: .12rem .45rem;
+    border-radius: 6px;
+    color: var(--formula-code-fg);
+    font-weight: 600;
+}
+
+/* ---- dark code panel ---- */
+.code-block {
+    background: #241409;
+    color: #e6dcd2;
+    border: 1px solid #3a2617;
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    font-size: .84rem;
+    overflow-x: auto;
+    white-space: pre;
+    font-family: Consolas, "Courier New", monospace;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05);
+}
+
+.code-block .bad     { color: #ff9a8f; }
+.code-block .good    { color: #9fd8b0; }
+.code-block .comment { color: #b0a392; }
+.code-block .kw      { color: #f2c17b; }
+
+/* any <code> inside the dark panel keeps the panel's light text colour */
+.code-block code { color: inherit; background: transparent; border: 0; }
+
+/* ---- IDOR demonstration cards (semantics kept: red = broken, green = safe) ---- */
+.vuln-card {
+    border-top: 5px solid var(--red);
+    background: var(--vuln-bg);
+}
+
+.secure-card {
+    border-top: 5px solid var(--green);
+    background: var(--secure-bg);
+}
+
+/* ---- footer ---- */
+.app-footer {
+    background: transparent;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: .82rem;
+}
+
+/* ==========================================================================
+   13. RESPONSIVE
+   --------------------------------------------------------------------------
+   The menu itself is collapsed behind the ☰ button at EVERY size, so only
+   the tight corners of the top bar need special care on small screens.
+   ========================================================================== */
+
+@media (max-width: 767.98px) {
+    /* tighter top bar tools */
+    .app-topnav-tools { gap: .4rem; padding-left: .4rem; }
+    .app-topnav .navbar-brand { margin-right: .5rem; }
+
+    .app-content h1.h3 { font-size: 1.45rem; }
+    .stat-value { font-size: 1.5rem; }
+    .chart-box { padding: .95rem 1rem 1.05rem; }
+    .table { font-size: .88rem; }
+    .table td,
+    .table th { padding: .65rem .7rem; }
+}
+
+@media (max-width: 575.98px) {
+    /* keep room for the tools: the brand subtitle is dropped on phones */
+    .app-topnav .navbar-brand small { display: none; }
+
+    .chart-canvas-wrap { height: 260px; }
+
+    .app-content h1.h3:not(.text-danger) { font-size: 1.3rem; padding-bottom: .6rem; }
+    .app-content h1.h3:not(.text-danger)::after { width: 52px; }
+
+    .stat-card .stat-body { padding: .9rem 1rem 1rem; }
+    .stat-value { font-size: 1.35rem; }
+    .stat-label { font-size: .68rem; }
+
+    .alert { padding: .8rem .9rem; font-size: .9rem; }
+    .formula-box { padding: .8rem .9rem; font-size: .9rem; }
+    .code-block { padding: .85rem; font-size: .78rem; }
+
+    .btn { font-size: .93rem; }
+}
+
+/* ==========================================================================
+   14. LIGHT / DARK THEME
+   --------------------------------------------------------------------------
+   The ☀️ / 🌙 button in the top bar toggles data-bs-theme="dark" on <html>
+   (assets/js/theme.js remembers the choice in localStorage, so it also
+   applies to the next page).
+
+   LIGHT : clean white / cream bakery background with dark chocolate text.
+   DARK  : dark chocolate / charcoal background with warm light text.
+
+   Almost every colour in this file is a TOKEN declared in section 1, so
+   this section only re-declares those tokens - no other rule has to know
+   which mode is on. A few components that use fixed colours (buttons and
+   pills) get their own override right underneath.
+   ========================================================================== */
+[data-bs-theme="dark"] {
+    color-scheme: dark;                    /* dark scrollbars, date pickers */
+
+    /* --- page background + surfaces --- */
+    --cream: #1a1108;                      /* page background      */
+    --cream-2: #33241a;                    /* soft panels + badges */
+    --cream-3: #2b1e15;                    /* zebra stripe         */
+    --surface: #291c13;                    /* cards, tables, inputs */
+    --input-bg: #20150e;
+    --thead-top: #37271a;
+    --table-hover: #35261a;
+    --card-border: rgba(255, 255, 255, .09);
+    --line: #3d2e22;
+
+    /* --- text --- */
+    --ink: #f0e7dc;
+    --muted: #b3a494;
+    --heading: #f7efe4;
+    --heading-2: #e3d6c6;
+    --on-soft: #e8dcc9;
+
+    /* --- accent colours brightened for dark backgrounds --- */
+    --link: #f08a55;
+    --link-hover: #ffc19e;
+    --terracotta-text: #f08a55;
+    --green-text: #7fd7a8;
+    --red-text: #ff9d92;
+    --amber-text: #f5c16a;
+    --cell-alert-fg: #ffb08a;
+    --row-danger-fg: #ffb4ab;
+    --row-success-fg: #a7e8c3;
+    --row-warning-fg: #f3cf90;
+
+    /* --- badges and small pills --- */
+    --badge-secondary: #6d5744;
+    --badge-warning-bg: #7a5410;
+    --badge-warning-fg: #fbe6bd;
+
+    /* --- formula box, IDOR cards, banners, alerts --- */
+    --code-inline-bg: rgba(255, 255, 255, .10);
+    --formula-bg: #2f2116;
+    --formula-fg: #e3d6c6;
+    --formula-border: #6f4c26;
+    --formula-code-fg: #f0c98a;
+    --vuln-bg: #2d1b17;
+    --secure-bg: #17251d;
+    --red-soft: #3a1a16;
+    --green-soft: #16301f;
+    --amber-soft: #3a2a10;
+    --banner-bg: linear-gradient(90deg, #3a1a16, #4a2019);
+    --banner-border: #6d2b23;
+    --banner-fg: #ffb4ab;
+    --alert-shadow: 0 1px 3px rgba(0, 0, 0, .45);
+
+    /* --- depth (shadows need to be darker to be seen on dark) --- */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .45), 0 10px 24px rgba(0, 0, 0, .35);
+    --shadow-md: 0 14px 32px rgba(0, 0, 0, .50);
+
+    /* --- Bootstrap variables that this stylesheet owns --- */
+    --bs-body-bg: var(--cream);
+    --bs-body-color: var(--ink);
+    --bs-emphasis-color: var(--ink);
+    --bs-emphasis-color-rgb: 240, 231, 220;
+    --bs-secondary-color: var(--muted);
+    --bs-secondary-rgb: 179, 164, 148;
+    --bs-heading-color: var(--heading);
+    --bs-border-color: var(--line);
+    --bs-code-color: #ffb9a8;
+
+    --bs-link-color: var(--link);
+    --bs-link-color-rgb: 240, 138, 85;
+    --bs-link-hover-color: var(--link-hover);
+    --bs-link-hover-color-rgb: 255, 193, 158;
+
+    /* used as TEXT (.text-primary, .text-danger, ...) -> light warm tones */
+    --bs-primary-rgb: 240, 138, 85;
+    --bs-primary-text-emphasis: var(--terracotta-text);
+    --bs-success-rgb: 127, 215, 168;
+    --bs-danger-rgb: 255, 157, 146;
+    --bs-warning-rgb: 245, 193, 106;
+    --bs-info-rgb: 227, 214, 198;
+
+    /* soft alert boxes: same hues, dark tinted backgrounds */
+    --bs-success-text-emphasis: var(--row-success-fg);
+    --bs-success-bg-subtle: var(--green-soft);
+    --bs-success-border-subtle: #2d5c40;
+    --bs-danger-text-emphasis: var(--row-danger-fg);
+    --bs-danger-bg-subtle: var(--red-soft);
+    --bs-danger-border-subtle: #7a2f26;
+    --bs-warning-text-emphasis: var(--row-warning-fg);
+    --bs-warning-bg-subtle: var(--amber-soft);
+    --bs-warning-border-subtle: #6e5220;
+    --bs-info-text-emphasis: var(--on-soft);
+    --bs-info-bg-subtle: var(--formula-bg);
+    --bs-info-border-subtle: var(--formula-border);
+    --bs-light-text-emphasis: var(--on-soft);
+    --bs-light-bg-subtle: var(--formula-bg);
+    --bs-light-border-subtle: var(--formula-border);
+    --bs-dark-text-emphasis: var(--heading);
+    --bs-dark-bg-subtle: #3a2a1c;
+    --bs-dark-border-subtle: #54402c;
+}
+
+/* ---- components that ship with fixed colours ---- */
+
+/* the "#123" audit badge: a light pill reads better on a dark page */
+[data-bs-theme="dark"] .text-bg-dark {
+    background-color: #f0e7dc !important;
+    color: #1a1108 !important;
+}
+
+/* selected demo user (dark button) -> light button, and its outline twin */
+[data-bs-theme="dark"] .btn-dark {
+    --bs-btn-bg: #f0e7dc;
+    --bs-btn-border-color: #f0e7dc;
+    --bs-btn-color: #1a1108;
+    --bs-btn-hover-bg: #ddd1c3;
+    --bs-btn-hover-border-color: #ddd1c3;
+    --bs-btn-hover-color: #1a1108;
+    --bs-btn-active-bg: #cec1b2;
+    --bs-btn-active-border-color: #cec1b2;
+    --bs-btn-active-color: #1a1108;
+}
+
+[data-bs-theme="dark"] .btn-outline-dark {
+    --bs-btn-color: #e3d6c6;
+    --bs-btn-border-color: #8d7b69;
+    --bs-btn-hover-bg: #f0e7dc;
+    --bs-btn-hover-border-color: #f0e7dc;
+    --bs-btn-hover-color: #1a1108;
+    --bs-btn-active-bg: #ddd1c3;
+    --bs-btn-active-border-color: #ddd1c3;
+    --bs-btn-active-color: #1a1108;
+}
+
+/* the dark code panel keeps its look, only the outline is strengthened
+   so it still reads as a panel on a dark card */
+[data-bs-theme="dark"] .code-block {
+    border-color: #5a4630;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07);
+}
+
+/* ==========================================================================
+   15. DEMO USER SWITCHER
+   --------------------------------------------------------------------------
+   The named list under "1. Choose the demo user" on the Security page - it is
+   what the "switch demo user ->" link at the bottom of the hamburger menu
+   opens. Purely presentational: every row is an ordinary link to
+   security/switch.php, exactly like before.
+   ========================================================================== */
+
+/* the two bars at the top of the page are sticky (~120px together), so the
+   anchor target of the menu link needs a little head room when the browser
+   scrolls to it */
+#demo-users {
+    scroll-margin-top: 8.25rem;
+}
+
+.demo-user-list {
+    display: grid;
+    gap: .55rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.demo-user-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem .7rem;
+    padding: .6rem .7rem;
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-left: 4px solid transparent;
+    border-radius: var(--radius-md);
+    transition: border-color .15s ease;
+}
+
+.demo-user-row:hover {
+    border-color: var(--terracotta-line);
+    border-left-color: var(--terracotta);
+}
+
+/* the user that is signed in at this moment (border + badge, NOT a colour
+   change, so the text keeps its full contrast in both themes) */
+.demo-user-row.is-current {
+    border-color: var(--terracotta-line);
+    border-left-color: var(--terracotta);
+    box-shadow: var(--shadow-sm);
+}
+
+.demo-user-avatar {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 50%;
+    background: var(--terracotta);     /* white initials on it = 5.7:1 (AA) */
+    color: #fff;
+    font-size: .76rem;
+    font-weight: 700;
+}
+
+.demo-user-info {
+    flex: 1 1 11rem;
+    min-width: 0;
+}
+
+.demo-user-name {
+    color: var(--heading);
+    font-size: .95rem;
+    overflow-wrap: anywhere;
+}
+
+.demo-user-badge {
+    margin-left: .35rem;
+    vertical-align: middle;
+}
+
+.demo-user-meta {
+    display: block;
+    color: var(--muted);
+    overflow-wrap: anywhere;
+}
+
+.demo-user-btn {
+    flex: 0 0 auto;
+    margin-left: auto;
+    white-space: normal;
+}
+
+@media (max-width: 575.98px) {
+    .demo-user-row { padding: .55rem .6rem; }
+    .demo-user-avatar { width: 1.9rem; height: 1.9rem; font-size: .7rem; }
+    .demo-user-info { flex-basis: 9rem; }
+}
